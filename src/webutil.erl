@@ -1,7 +1,7 @@
 -module(webutil).
 -behaviour(gen_server).
 -define(SERVER(ProfileName), list_to_atom(atom_to_list(ProfileName) ++ "@" ++ atom_to_list(?MODULE))).
--define(DEFAULT_HTTP_OPTIONS, [{connect_timeout, 500}]).
+-define(DEFAULT_HTTP_OPTIONS, [{connect_timeout, 1000}]).
 -define(DEFAULT_OPTIONS, [{sync,true}]).
 
 %% ------------------------------------------------------------------
