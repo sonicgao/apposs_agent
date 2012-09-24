@@ -1,6 +1,6 @@
 @setlocal
 
-@set node_name=apposs-agent
+@set node_name=apposs_agent
 
 @rem Get the abolute path to the parent directory,
 @rem which is assumed to be the node root.
