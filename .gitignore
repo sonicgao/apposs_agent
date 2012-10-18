@@ -1,5 +1,5 @@
 ebin/*
-rel/apposs-agent
+rel/apposs_agent
 rel/src
 */*.beam
 *~

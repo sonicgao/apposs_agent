@@ -1,4 +1,4 @@
-{application, agent,
+{application, apposs_agent,
  [
   {description, ""},
   {vsn, "1.0.2"},
