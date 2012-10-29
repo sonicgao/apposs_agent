@@ -4,6 +4,7 @@
 
 -include("agent.hrl").
 -define(timeout, 10000).
+-define(exec_timeout, 180000).
 
 -ifdef(TEST).
 -compile(export_all).
@@ -46,7 +47,7 @@ add_def_opts(Opts, [{K, _} = DefOpt | Rest]) ->
 
 exec(Conn, {Command, _Oid}) ->
   {ok, Chl} = ssh_connection:session_channel(Conn,?timeout),
-  success = ssh_connection:exec(Conn,Chl,Command,?timeout),
+  success = ssh_connection:exec(Conn,Chl,Command,?exec_timeout),
   Chl.
 
 handle_info({ssh_cm, Conn, {data, Chl, Type_code, Data}}, Conn, Chl) ->
