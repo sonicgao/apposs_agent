@@ -89,7 +89,7 @@ analyse_cmds(Cmds) ->
 
 create_clients(BaseUrl, Cmds) ->
   F = fun(Host) ->
-    {ok, Result} = webutil:http_get(
+    X = webutil:http_get(
       poller,
       BaseUrl ++ "/api/load_hosts",
       [{hosts, Host}],
@@ -102,7 +102,12 @@ create_clients(BaseUrl, Cmds) ->
           lib_misc:parse_string(HostLine)
       end
     ),
-    Result
+    case X of
+      {ok, Result} -> Result;
+      {error, Why} ->
+        error_logger:error_msg("load host(~p) failed, Why: ~p~n", [Host, Why]),
+        []
+    end
   end,
   lists:foreach(
     fun({Host, _, _}) ->
