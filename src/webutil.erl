@@ -3,6 +3,7 @@
 -define(SERVER(ProfileName), list_to_atom(atom_to_list(ProfileName) ++ "@" ++ atom_to_list(?MODULE))).
 -define(DEFAULT_HTTP_OPTIONS, [{connect_timeout, 1000}]).
 -define(DEFAULT_OPTIONS, [{sync,true}]).
+-define(HTTP_RETRY_TIMES, 5).
 
 %% ------------------------------------------------------------------
 %% API Function Exports
@@ -48,23 +49,30 @@ init([ProfileName]) ->
   {ok, [ProfileName]}.
 
 handle_call({http_get, Url, Params, CbFunc}, _From, [ProfileName]) ->
-  Reply = http_response(Url, Params, CbFunc, httpc:request(
-            get,
-            {Url ++ "?" ++ lib_misc:join_params(Params),[]},
-            ?DEFAULT_HTTP_OPTIONS,
-            ?DEFAULT_OPTIONS,
-            ProfileName
-        )),
+  HttpFunc = fun() -> 
+          http_response(Url, Params, CbFunc, httpc:request(
+              get,
+              {Url ++ "?" ++ lib_misc:join_params(Params),[]},
+              ?DEFAULT_HTTP_OPTIONS,
+              ?DEFAULT_OPTIONS,
+              ProfileName
+          ))
+  end,
+  
+  Reply = try_func(HttpFunc, ?HTTP_RETRY_TIMES),
   {reply, Reply, [ProfileName]};
 handle_call({http_post, Url, Params, CbFunc}, _From, [ProfileName]) ->
   ContentType = "application/x-www-form-urlencoded",
-  Reply = http_response(Url, Params, CbFunc, httpc:request(
-            post,
-            { Url, [], ContentType, lib_misc:join_params(Params) },
-            ?DEFAULT_HTTP_OPTIONS,
-            ?DEFAULT_OPTIONS,
-            ProfileName
-        )),
+  HttpFunc = fun() -> 
+          http_response(Url, Params, CbFunc, httpc:request(
+              post,
+              { Url, [], ContentType, lib_misc:join_params(Params) },
+              ?DEFAULT_HTTP_OPTIONS,
+              ?DEFAULT_OPTIONS,
+              ProfileName
+          ))
+  end,
+  Reply = try_func(HttpFunc, ?HTTP_RETRY_TIMES),
   {reply, Reply, [ProfileName]}.
 
 handle_cast(_Msg, State) ->
@@ -84,6 +92,20 @@ code_change(_OldVsn, State, _Extra) ->
 %% Internal Function Definitions
 %% ------------------------------------------------------------------
 
+try_func(F,0) -> F();
+try_func(F,N) -> 
+  case F() of
+    {error, 502} -> 
+        % Continue retry when center is down
+        timer:sleep(1000),
+        try_func(F, N); 
+    {error, econnrefused} -> 
+        % Continue retry when center is down
+        timer:sleep(1000),
+        try_func(F, N); 
+    {error, socket_closed_remotely} -> try_func(F,N-1);
+    X -> X
+  end.
 
 http_response(Url, Params, F,{ok, {{_Version, 200, _ReasonPhrase}, _Headers, Body}}) ->
   error_logger:info_msg("http req: ~p(~p)~nresp: ~p~n", [Url, Params, Body]),
