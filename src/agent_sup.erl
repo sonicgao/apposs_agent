@@ -25,7 +25,7 @@ start_link() ->
 
 start_link(Center_url, Responder_mod, Poll_delay) ->
   crypto:start(),
-  ssh:start(permanent),
+  ssh:start(temporary),
   supervisor:start_link({local, ?MODULE}, ?MODULE, [Center_url, Responder_mod, Poll_delay]).
 
 stop() ->
