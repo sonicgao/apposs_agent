@@ -32,13 +32,13 @@ http_get(ProfileName, Url,Params) ->
   http_get(ProfileName, Url,Params,fun(Body) -> Body end).
 
 http_get(ProfileName, Url,Params,CbFunc) ->
-  gen_server:call(?SERVER(ProfileName), {http_get, Url, Params, CbFunc}, 10000).
+  gen_server:call(?SERVER(ProfileName), {http_get, Url, Params, CbFunc}, infinity).
 
 http_post(ProfileName, Url,Params) ->
   http_post(ProfileName, Url,Params,fun(Body) -> Body end).
 
 http_post(ProfileName, Url,Params,CbFunc) ->
-  gen_server:call(?SERVER(ProfileName), {http_post, Url, Params, CbFunc}, 10000).
+  gen_server:call(?SERVER(ProfileName), {http_post, Url, Params, CbFunc}, infinity).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
