@@ -207,11 +207,14 @@ handle_sync_event(stop, _From, _StateName, #state{host=Host}=State) ->
   {stop, normal, ok, State}.
 
 handle_info(Info, StateName, #state{cm=Cm, handler=Handler, datas=Datas, exec_mod=ExecMod}=State) ->
+  error_logger:info_msg("client handle_info ~p ~p", [Info, StateName]),
   try ExecMod:handle_info(Info, Cm, Handler) of
     {data, Data} ->
       {next_state, StateName, State#state{datas=[Data | Datas]}};
     {exit_status, ExitStatus} ->
-      {next_state, StateName, State#state{cmd_exit_status=ExitStatus}};
+      % 遇到进程结束，就主动finish，这部分的代码和closed分支之间存在潜在的协调问题
+      {NextState, NewState} = finish_cmd(StateName, State#state{cmd_exit_status=ExitStatus}),
+      {next_state, NextState, NewState};
     eof ->
       % 如果被interrupt，有可能接受不到eof消息，所以不再这里反转和拼接消息，而是放在closed中。 
       {next_state, StateName, State};
