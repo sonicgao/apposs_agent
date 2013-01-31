@@ -33,6 +33,12 @@ handle_options([{password, _} = Opt | Rest], Opts, Port) ->
 handle_options([_Opt | Rest], Opts, Port) ->
   handle_options(Rest, Opts, Port).
 
+add_def_opts([]) ->
+  [
+    {port, 22},
+    {silently_accept_hosts, true},
+    {user_interaction, false}
+  ];
 add_def_opts(Opts) ->
   add_def_opts(Opts, [{silently_accept_hosts, true}, 
                       {user_interaction, false}]).
