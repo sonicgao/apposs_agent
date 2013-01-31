@@ -6,6 +6,7 @@ create_test() ->
   recover:start(),
   crypto:start(),
   ssh:start(),
+  http_channel_sup:start_link(),
   conn_sup:start_link(responder_mock),
   ?assertMatch([], supervisor:which_children(conn_sup)),
 
