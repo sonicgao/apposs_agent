@@ -1,6 +1,6 @@
 %% 创建新的进程来执行指令，并返回新进程的pid，可以通过该pid强制终止指令的执行。
 -module(ssh_executor).
--export([conn_manager/2, exec/2, handle_info/3, terminate/1]).
+-export([conn_manager/2, exec/2, handle_info/3, handle_options/1, terminate/1]).
 
 -include("agent.hrl").
 -define(timeout, 10000).
@@ -17,10 +17,10 @@ conn_manager(Host, Options) ->
 handle_options(Opts) ->
   handle_options(proplists:unfold(Opts), [], 22).
 
-handle_options([], Opts, Port) ->
-  [{opts, Opts},{port, Port}];
-handle_options([{port, Port} | Rest], Opts, Port) ->
-  P = if 
+handle_options([], Opts, DefaultPort) ->
+  [{opts, Opts},{port, DefaultPort}];
+handle_options([{port, Port} | Rest], Opts, _DefaultPort) ->
+  P = if
     Port =:= "" -> 22;
     is_list(Port) -> list_to_integer(Port);
     is_integer(Port) -> Port

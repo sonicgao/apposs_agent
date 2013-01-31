@@ -57,14 +57,14 @@ receive_loop(Cm, Handler, Datas, ExitStatus) ->
 
 handle_options_test_() ->
   [
-   ?_assertMatch([{port, 22}], ssh_executor:handle_options([{port, ""}])),
-   ?_assertMatch([{port, 222}], ssh_executor:handle_options([{port, "222"}])),
-   ?_assertMatch([{port, 333}], ssh_executor:handle_options([{port, 333}])),
-   ?_assertMatch([{password, "hello1234"}, {user,"lifu"}],
+   ?_assertMatch([{opts,[]}, {port,22}], ssh_executor:handle_options([{port, ""}])),
+   ?_assertMatch([{opts,[]}, {port, 222}], ssh_executor:handle_options([{port, "222"}])),
+   ?_assertMatch([{opts,[]}, {port, 333}], ssh_executor:handle_options([{port, 333}])),
+   ?_assertMatch([{opts,[{password,"hello1234"},{user,"lifu"}]},{port,22}],
                  ssh_executor:handle_options([{user,"lifu"},
                                               {password, "hello1234"}, 
                                               {foo, "bar"}])),
-   ?_assertMatch([], ssh_executor:handle_options([]))
+   ?_assertMatch([{opts,[]},{port,22}], ssh_executor:handle_options([]))
   ].
 
 add_def_opts_test_() ->
@@ -76,5 +76,5 @@ add_def_opts_test_() ->
   ].
 
 get_opts() ->
-  [{user,"lifu"},{password, "hello1234"}].
+  [{user,"sonic"},{password, "hello1234"}].
 
