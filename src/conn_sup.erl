@@ -22,5 +22,5 @@ init([Responder_mod]) ->
     [client]
   },
   http_channel_sup:start_child(client),
-  {ok,{{simple_one_for_one,10,100}, [ProcessSpec]}}.
+  {ok, {{simple_one_for_one,10,100}, [ProcessSpec]}}.
 

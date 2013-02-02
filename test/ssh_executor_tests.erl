@@ -60,7 +60,7 @@ handle_options_test_() ->
    ?_assertMatch([{opts,[]}, {port,22}], ssh_executor:handle_options([{port, ""}])),
    ?_assertMatch([{opts,[]}, {port, 222}], ssh_executor:handle_options([{port, "222"}])),
    ?_assertMatch([{opts,[]}, {port, 333}], ssh_executor:handle_options([{port, 333}])),
-   ?_assertMatch([{opts,[{password,"hello1234"},{user,"lifu"}]},{port,22}],
+   ?_assertMatch([{opts, [{password,"hello1234"}, {user,"lifu"}]}, {port,22}],
                  ssh_executor:handle_options([{user,"lifu"},
                                               {password, "hello1234"}, 
                                               {foo, "bar"}])),
@@ -76,5 +76,5 @@ add_def_opts_test_() ->
   ].
 
 get_opts() ->
-  [{user,"sonic"},{password, "hello1234"}].
+  [{user,"lifu"}, {password, "hello1234"}, {port,2222}].
 
